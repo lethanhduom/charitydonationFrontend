@@ -57,11 +57,11 @@
     width: 100%;
   }
   
-  .active {
+  .admin_menu {
     background: var(--activeItem);
     margin-left: 0;
   }
-  .active::before {
+  .admin_menu::before {
     content: "";
     width: 8px;
     height: 100%;

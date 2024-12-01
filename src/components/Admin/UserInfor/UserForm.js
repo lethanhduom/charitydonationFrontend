@@ -3,6 +3,7 @@ import { TextField, Button, Container, Stack } from '@mui/material';
 import { Link, Navigate, NavLink, useNavigate } from "react-router-dom"
 import { MenuItem } from '@mui/material';
  import "../UserInfor/UserForm.css"
+ import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import listRole from '../../../Service/RoleService';
 import { act } from 'react';
 const UserForm = (props) => {
@@ -130,7 +131,7 @@ const UserForm = (props) => {
                 {/* <MenuItem  value="option1"></MenuItem>
                 <MenuItem value="option2"></MenuItem> */}
                 </TextField>
-                <Button variant="outlined" color="secondary" type="submit">Next Step</Button>
+                <Button  variant="outlined" color="secondary" type="submit">Next <ArrowForwardOutlinedIcon/></Button>
             </form>
             </div>
            

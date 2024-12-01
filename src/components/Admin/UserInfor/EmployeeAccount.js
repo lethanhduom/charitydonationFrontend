@@ -1,39 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import { TextField, Button, Container, Stack } from '@mui/material';
-import { Link, Navigate, NavLink, useNavigate } from "react-router-dom"
+import { json, Link, Navigate, NavLink, useNavigate } from "react-router-dom"
 import { MenuItem } from '@mui/material';
  import "../UserInfor/UserForm.css"
 import listRole from '../../../Service/RoleService';
-
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 const EmployeeAccount=()=>{
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-    const [dateOfBirth, setDateOfBirth] = useState('')
-    const [password, setPassword] = useState('')
-    const[getrole,setrole]=useState('')
-    const[gender,setgender]=useState('')
-    const [roles,setRole]=useState([]);
-  
+    const [Faculty, setFaculty] = useState('')
+    const [IdEmployee, setIdEmployee] = useState('')
+    const [Address, setAddress] = useState('')
+     
     const navigate=useNavigate();
-        // useEffect(()=>{
-    //     CollectUser.then((respone)=>{
-    //          setcollect(respone.data);
-    //     }).catch(error=>console.error(error))
-    // })
+ 
 
-    useEffect(()=>{
-        listRole().then((respone)=>
-        {
-            setRole(respone.data);
-        }).catch(error=>console.error(error));
-        
-    },[])
+
     function handleSubmit(event) {
        
         event.preventDefault();
-        // const history = useHistory();
-        console.log(firstName, lastName, email, dateOfBirth, password,gender,getrole) ;
+        const employeeInfor=(Faculty,Address,IdEmployee);
+        localStorage.setItem("employeeInfor", JSON.stringify(employeeInfor));
+        console.log(Faculty,Address,IdEmployee) ;
        navigate("add")
        
     }
@@ -51,8 +37,8 @@ const EmployeeAccount=()=>{
                         variant='outlined'
                         color='secondary'
                         label="Faculty"
-                        onChange={e => setFirstName(e.target.value)}
-                        value={firstName}
+                        onChange={e => setFaculty(e.target.value)}
+                        value={Faculty}
                         fullWidth
                         required
                     />
@@ -64,8 +50,8 @@ const EmployeeAccount=()=>{
                     variant='outlined'
                     color='secondary'
                     label="ID Employee"
-                    onChange={e => setEmail(e.target.value)}
-                    value={email}
+                    onChange={e => setIdEmployee(e.target.value)}
+                    value={IdEmployee}
                     fullWidth
                     required
                     sx={{mb: 4}}
@@ -79,7 +65,8 @@ const EmployeeAccount=()=>{
                         variant="outlined"
                         color="secondary"
                         fullWidth
-                        onChange={e=>setgender(e.target.value)}
+                        onChange={e=>setAddress(e.target.value)}
+                        value={Address}
                         required
                         sx={{ mb: 4 }}>
     
@@ -89,7 +76,7 @@ const EmployeeAccount=()=>{
                 </Stack>
               
               
-                <Button variant="outlined" color="secondary" type="submit">Next Step</Button>
+                <Button variant="outlined" color="secondary" type="submit">Next <ArrowForwardOutlinedIcon/></Button>
             </form>
             </div>
            

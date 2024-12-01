@@ -3,3 +3,13 @@
     display: flex;
     margin-left: auto;
 }
+.MuiTable-root{
+    max-height: 300px;
+    overflow-y: auto;
+}
+#addButton{
+    text-decoration: none;
+}
+.navButton{
+    text-decoration: none;
+}

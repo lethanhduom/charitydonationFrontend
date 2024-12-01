@@ -1,4 +1,4 @@
-admin-container {
+#admin_page {
     --yellow: linear-gradient(180deg, #F8D49A -146.42%, #FAD79D -46.42%);
     --orange: #fca61f;
     --black: #242d49;
@@ -11,7 +11,7 @@ admin-container {
     --activeItem: #f799a354;
   }
   
-  admin-container {
+ #admin_page {
     /* padding: 0.5rem 3.5rem; */
     color: var(--black);
     background: linear-gradient(
@@ -46,7 +46,7 @@ admin-container {
   }
   
   @media screen and (max-width: 768px) {
-    .admin-container{
+     .admin-container{
       grid-template-columns: 1fr;
     } 
   }

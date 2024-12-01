@@ -39,7 +39,7 @@ const Sidebar = () => {
         {SidebarData.map((item, index) => {
           return (
             <NavLink to ={item.link}
-              className={selected === index ? "menuItem active" : "menuItem"}
+              className={selected === index ? "menuItem admin_menu" : "menuItem"}
               key={index}
               onClick={() => setSelected(index)}
             >

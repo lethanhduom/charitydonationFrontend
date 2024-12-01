@@ -6,35 +6,27 @@ import { MenuItem } from '@mui/material';
 import listRole from '../../../Service/RoleService';
 
  const UserAccount=()=>{
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-    const [dateOfBirth, setDateOfBirth] = useState('')
-    const [password, setPassword] = useState('')
-    const[getrole,setrole]=useState('')
-    const[gender,setgender]=useState('')
-    const [roles,setRole]=useState([]);
+    const [AcadamyEndYear, setAcadamyEndYear] = useState('')
+    const [AcadamyStartYear, setAcadamyStartYear] = useState('')
+    const [Faculty,setFuculty] = useState('')
+    const [idStudent, setIdStudent] = useState('')
+    const [Class, setClass] = useState('')
+    const[Address,setAddress]=useState('')
 
     const navigate=useNavigate();
   // Gọi lại dữ liệu từ localStorage
 const commonInfor = JSON.parse(localStorage.getItem("commonInfor"));
 console.log(commonInfor);
  
-    useEffect(()=>{
-        listRole().then((respone)=>
-        {
-            setRole(respone.data);
-        }).catch(error=>console.error(error));
-        
-    },[])
+  
     function handleSubmit(event) {
        
         event.preventDefault();
         // const history = useHistory();
-        console.log(firstName, lastName, email, dateOfBirth, password,gender,getrole) ;
-
+        console.log(Faculty, Class, AcadamyEndYear, AcadamyStartYear, idStudent,Address) ;
+        const UserInfor={Faculty,Class,AcadamyEndYear,AcadamyStartYear,idStudent,Address};
+        localStorage.setItem("userInfor",JSON.stringify(UserInfor));
        navigate("add")
-        
     }
  
     return (
@@ -50,8 +42,8 @@ console.log(commonInfor);
                         variant='outlined'
                         color='secondary'
                         label="Faculty"
-                        onChange={e => setFirstName(e.target.value)}
-                        value={firstName}
+                        onChange={e => setFuculty(e.target.value)}
+                        value={Faculty}
                         fullWidth
                         required
                     />
@@ -60,8 +52,8 @@ console.log(commonInfor);
                         variant='outlined'
                         color='secondary'
                         label="Class"
-                        onChange={e => setLastName(e.target.value)}
-                        value={lastName}
+                        onChange={e => setClass(e.target.value)}
+                        value={Class}
                         fullWidth
                         required
                     />
@@ -72,8 +64,8 @@ console.log(commonInfor);
                     variant='outlined'
                     color='secondary'
                     label="Acadamy Start Year"
-                    onChange={e => setEmail(e.target.value)}
-                    value={email}
+                    onChange={e => setAcadamyStartYear(e.target.value)}
+                    value={AcadamyStartYear}
                     fullWidth
                     required
                     sx={{mb: 4}}
@@ -83,8 +75,8 @@ console.log(commonInfor);
                     variant='outlined'
                     color='secondary'
                     label="Acadamy End Year"
-                    onChange={e => setPassword(e.target.value)}
-                    value={password}
+                    onChange={e => setAcadamyEndYear(e.target.value)}
+                    value={AcadamyEndYear}
                     required
                     fullWidth
                     sx={{mb: 4}}
@@ -97,7 +89,8 @@ console.log(commonInfor);
                         variant="outlined"
                         color="secondary"
                         fullWidth
-                        onChange={e=>setgender(e.target.value)}
+                        onChange={e=>setIdStudent(e.target.value)}
+                        value={idStudent}
                         required
                         sx={{ mb: 4 }}>
     
@@ -108,8 +101,8 @@ console.log(commonInfor);
                     variant='outlined'
                     label="Address"
                     color='secondary'
-                    onChange={e => setDateOfBirth(e.target.value)}
-                    value={dateOfBirth}
+                    onChange={e => setAddress(e.target.value)}
+                    value={Address}
                     fullWidth
                     required
                     sx={{mb: 4}}
@@ -117,7 +110,7 @@ console.log(commonInfor);
                 </Stack>
               
               
-                <Button variant="outlined" color="secondary" type="submit">Next Step</Button>
+                <Button variant="outlined" color="secondary" type="submit">Next</Button>
             </form>
             </div>
            
