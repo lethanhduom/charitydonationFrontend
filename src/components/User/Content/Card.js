@@ -1,9 +1,13 @@
+
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ProgressBar from './ProgressBar';
 import Button from '@mui/material/Button';
 import { CampaginDisplayUser } from '../../../Service/UserService';
 import { getImageRepresent } from '../../../Service/Campaign';
+import CampaignDetail from './CampaignDetail';
+import Modal from '@mui/material/Modal';
+
 const CardContainer = styled.div`
   padding: 50px;
   display: flex;
@@ -56,6 +60,7 @@ const Footer = styled.div`
 `;
 
 const Card = () => {
+
   const [campaignList,setCampaignList]=useState([]);
  
   useEffect((async)=>{
@@ -79,6 +84,15 @@ const Card = () => {
 
     })
   },[])
+
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+
+
   return (
   
    
@@ -95,11 +109,20 @@ const Card = () => {
       <ProgressBar completed={7} />
       <Footer>
         <span>1,084 lượt quyên góp</span>
-        <Button className='outlined'>Quyên góp</Button>
+        <CampaignDetail />
       </Footer>
+
       </CardContain>
  ))}
     
+
+
+      {/* <Modal open={open} onClose={handleClose}>
+        <div>
+          <CampaignDetail />
+        </div>
+      </Modal> */}
+
     </CardContainer>
   );
 };
