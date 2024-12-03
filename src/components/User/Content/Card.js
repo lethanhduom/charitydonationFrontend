@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import ProgressBar from './ProgressBar';
 import Button from '@mui/material/Button';
+import CampaignDetail from './CampaignDetail';
+import Modal from '@mui/material/Modal';
 
 const CardContainer = styled.div`
   border: 1px solid #e0e0e0;
@@ -40,6 +42,13 @@ const Footer = styled.div`
 `;
 
 const Card = () => {
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+
   return (
     <CardContainer>
       <Image src="https://via.placeholder.com/400x200" alt="Fundraising Image" />
@@ -49,8 +58,15 @@ const Card = () => {
       <ProgressBar completed={7} />
       <Footer>
         <span>1,084 lượt quyên góp</span>
-        <Button className='outlined'>Quyên góp</Button>
+        <CampaignDetail />
       </Footer>
+
+      {/* <Modal open={open} onClose={handleClose}>
+        <div>
+          <CampaignDetail />
+        </div>
+      </Modal> */}
+
     </CardContainer>
   );
 };
