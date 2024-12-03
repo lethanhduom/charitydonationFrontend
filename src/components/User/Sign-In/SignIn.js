@@ -19,6 +19,7 @@ import AppTheme from '../share-theme/AppTheme';
 import ColorModeSelect from '../share-theme/ColorModeSelect';
 import { loginUser } from '../../../Service/AccountService';
 import swal from 'sweetalert'
+import { OAuthConfig } from './configure';
 import { useNavigate } from 'react-router-dom';
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -78,6 +79,19 @@ export default function SignIn(props) {
 
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleClick = () => {
+    const callbackUrl = OAuthConfig.redirectUri;
+    const authUrl = OAuthConfig.authUri;
+    const googleClientId = OAuthConfig.clientId;
+
+    const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
+      callbackUrl
+    )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+
+    console.log(targetUrl);
+
+    window.location.href = targetUrl;
   };
 
 //   const handleSubmit = (event) => {
@@ -232,7 +246,7 @@ const handleLogin=(async)=>{
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert('Sign in with Google')}
+              onClick={() => handleClick()}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
