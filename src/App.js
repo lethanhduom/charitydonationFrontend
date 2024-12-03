@@ -18,6 +18,7 @@ import PaymentPage from './components/User/PayPal/PaymentPage';
 import CancelPage from './components/User/PayPal/CancelPage';
 import SuccessPage from './components/User/PayPal/SuccessPage';
 import SignIn from './components/User/Sign-In/SignIn';
+import Authenticate from './components/User/Sign-In/Authenticate';
 
 
 
@@ -49,7 +50,7 @@ function App() {
      
     </Route>
     <Route path='/login' element={<SignIn/>}></Route>
-  
+     <Route path='/authenticate' element={<Authenticate/>}></Route>
     {/* <Route path="/payment" element={<PaymentPage/>}/> */}
     {/* <Route path="/payment/success" element={<SuccessPage/>}/> */}
     {/* <Route path="/payment/cancel" element={<CancelPage/>}/> */}

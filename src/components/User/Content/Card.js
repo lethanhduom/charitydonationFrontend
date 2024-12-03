@@ -1,20 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ProgressBar from './ProgressBar';
 import Button from '@mui/material/Button';
-
+import { CampaginDisplayUser } from '../../../Service/UserService';
+import { getImageRepresent } from '../../../Service/Campaign';
 const CardContainer = styled.div`
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 20px;
+  padding: 50px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+`;
+
+const CardContain = styled.div`
+flex: 0 1 calc(33.333% - 16px); 
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 8px;
   max-width: 400px;
+  height: 450px;
+  overflow: hidden;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
 `;
 
 const Image = styled.img`
-  width: 100%;
+  width: 400px;
+  height: 200px;
   border-radius: 12px;
+
 `;
 
 const Title = styled.h3`
@@ -40,19 +56,53 @@ const Footer = styled.div`
 `;
 
 const Card = () => {
+  const [campaignList,setCampaignList]=useState([]);
+ 
+  useEffect((async)=>{
+    CampaginDisplayUser(0,9).then((response)=>{
+      // setCampaignList(response.data.content)
+      const campaigns = response.data.content;
+      const updatedCampaigns = [...campaigns]; 
+
+      response.data.content.forEach((campaign,index) => {
+        getImageRepresent(campaign.idCampaign).then(imageRes=>{
+          updatedCampaigns[index] = { ...campaign, campaignimages: imageRes.data.urlImage };
+          if (index === updatedCampaigns.length - 1) {
+            setCampaignList(updatedCampaigns); // Cập nhật state khi hoàn tất
+          }
+          // alert(imageRes.data.urlImage)
+          // alert(campaignList.campaignimages.urlImage)
+        })
+      });
+    
+     console.log(campaignList)
+
+    })
+  },[])
   return (
+  
+   
     <CardContainer>
-      <Image src="https://via.placeholder.com/400x200" alt="Fundraising Image" />
-      <Title>Gây quỹ cọng tay trao "Món quà được học"</Title>
+ {campaignList.map((campaign,index)=>(
+  <CardContain key={index}>
+
+      <Image src={campaign.campaignimages} alt="Fundraising Image" />
+      
+      <Title>{campaign.campaignName}</Title>
+      
       <SubTitle>Hands-On</SubTitle>
-      <Amount>11,145,226đ / 150,000,000đ</Amount>
+      <Amount>{campaign.currentAmmout}đ / {campaign.targetAmount}đ</Amount>
       <ProgressBar completed={7} />
       <Footer>
         <span>1,084 lượt quyên góp</span>
         <Button className='outlined'>Quyên góp</Button>
       </Footer>
+      </CardContain>
+ ))}
+    
     </CardContainer>
   );
 };
+
 
 export default Card;

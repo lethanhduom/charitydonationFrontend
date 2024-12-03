@@ -34,3 +34,6 @@ export const createAccountUser=(user)=>
     }
 export const createAccountEmployee=(employee)=> axios.post();
 export const introspect=(token)=>axios.post("http://localhost:8081/api/account/introspect",(token));
+export const getAccountByUserName=(userName)=>{
+    return axios.get(REST_API_BASE_URL+"/getaccount/"+userName);
+}

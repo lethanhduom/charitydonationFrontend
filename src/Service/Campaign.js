@@ -24,3 +24,18 @@ export const getDisplayCampaignUser=(page,size)=>{
 export const getDetailCampaign=(id)=>{
     return axios.get(REST_API_CAMPAIGN_BASE_URL+"/campaign/"+id);
 }
+export const getImage=(id)=>{
+    return axios.get(REST_API_CAMPAIGN_BASE_URL+"/campaign/image/"+id);
+}
+
+export const changeStatusDetail=(form)=>{
+    return axios.post(REST_API_CAMPAIGN_BASE_URL+"/campaign/changestatus",form,{
+        headers:{
+            "Authorization":`Bearer ${token}`
+        }
+    });
+}
+
+export const getImageRepresent=(id)=>{
+    return axios.get(REST_API_CAMPAIGN_BASE_URL+"/campaign/getimagerepresent/"+id);
+}

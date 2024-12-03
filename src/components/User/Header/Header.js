@@ -3,19 +3,21 @@ import image from "../Images/logo_user_page.png";
 import { useState } from "react";
 import { introspect } from "../../../Service/AccountService";
 import swal from 'sweetalert'
+import { Navigate } from "react-router-dom";
 const Header = (props) => {
   const [checkToken,setcheckToken]=useState(false);
   const token=sessionStorage.getItem("userToken");
-   introspect(token).then((response)=>{
-    setcheckToken(response.data.valid);
-    if(token!=null&&response.data.valid===false){
-      swal({
-        title: 'Phiên Đăng Nhập của bạn hết!',
-        text: 'Vui lòng đăng nhập lại.',
-        timer: 2000
-      })
-    }
-   })
+  //  introspect(token).then((response)=>{
+  //   setcheckToken(response.data.valid);
+  //   if(token!=null&&response.data.valid===false){
+  //     swal({
+  //       title: 'Phiên Đăng Nhập của bạn hết!',
+  //       text: 'Vui lòng đăng nhập lại.',
+  //       timer: 2000
+  //     })
+  //     // Navigate(to)
+  //   }
+  //  })
   return (
     <Container>
       <Logo>

@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
 import { AiOutlineCheck } from "react-icons/ai";
 import { AiOutlineClose } from "react-icons/ai";
-import { MenuItem, TableSortLabel, TextareaAutosize, TextField } from "@mui/material";
+import { IconButton, MenuItem, TableSortLabel, TextareaAutosize, TextField } from "@mui/material";
 import Row from 'react-bootstrap/Row';
 import { getCampaignPage, getLengthCampaign } from '../../../Service/Campaign';
 import swal from 'sweetalert';
@@ -25,6 +25,12 @@ import {
   import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import BasicBreadcrumbs from '../breadcrumbs/Breadcrumbs';
+import { getImage } from '../../../Service/Campaign';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { jwtDecode } from "jwt-decode";
+import { getEmployeeByIdAccount } from '../../../Service/EmployeeService';
+import { getAccountByUserName } from '../../../Service/AccountService';
+import { changeStatusDetail } from '../../../Service/Campaign';
 import axios from 'axios';
 const CampaignTable=()=>{
   //**Modal ****** */
@@ -77,7 +83,13 @@ const CampaignTable=()=>{
     const [endYear,setEndYear]=useState('');
     const [listspecialized,setListSpecialized]=useState([])
    const [listfaculty,setListFaculty]=useState([])
-   const [detailCampaign,setDetailCampaign]=useState()
+   const [detailCampaign,setDetailCampaign]=useState([])
+   const [detailRecipient,setDetailRecipient]=useState([])
+   const [detailFaculty,setDetailFaculty]=useState([])
+   const [detailSpecialized,setDetailSpecialized]=useState([])
+   const [detailImageCampaign,setDetailImageCampaign]=useState([])
+   const [accountPresent,setAccountPresent]=useState([])
+   const [employeePresent,setEmployeePresent]=useState([])
     // useEffect(()=>{
     //   getSpecialized().then(response=>{
     //     setListSpecialized(response.data)
@@ -120,6 +132,93 @@ const CampaignTable=()=>{
   const handleFileChange = (event) => {
     setFiles(event.target.files);
   };
+  const handleDeny=async(idCampaign)=>{
+    alert(idCampaign)
+    const token=sessionStorage.getItem("token");
+    if (token){
+      const willCreate = await swal({
+        title: "Are you sure?",
+        text: "Do you want to Accept this Campaign?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      });
+      if(willCreate){  
+      try {
+        const decodedToken = jwtDecode(token);
+       const response=await getAccountByUserName(decodedToken.sub);
+       setAccountPresent(response.data);
+       if(response.data){
+        const res=await getEmployeeByIdAccount(response.data.idAccount);
+        setEmployeePresent(res.data);
+        if(res.data){
+          const FormUpdate=new FormData();
+          FormUpdate.append("status",2);
+          FormUpdate.append("idEmployee",res.data.idEmployee);
+          FormUpdate.append("id",idCampaign);
+          const resUpdate=await axios.post("http://localhost:8081/api/campaign/changestatus",FormUpdate,{
+            headers:{
+               "Authorization":`Bearer ${token}`
+            }
+          })
+         if(resUpdate){
+          swal("Good job!", "This Campaign has been dinied!", "success");
+         }
+        }
+      
+
+       }
+
+      } catch (error) {
+        console.error('Invalid token:', error);
+      }
+    }
+  }
+  }
+  const handleAccept= async(idCampaign)=>{
+    alert(idCampaign)
+    const token=sessionStorage.getItem("token");
+    if (token){
+      const willCreate = await swal({
+        title: "Are you sure?",
+        text: "Do you want to Accept this Campaign?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      });
+      if(willCreate){  
+      try {
+        const decodedToken = jwtDecode(token);
+       const response=await getAccountByUserName(decodedToken.sub);
+       setAccountPresent(response.data);
+       if(response.data){
+        const res=await getEmployeeByIdAccount(response.data.idAccount);
+        setEmployeePresent(res.data);
+        if(res.data){
+          const FormUpdate=new FormData();
+          FormUpdate.append("status",1);
+          FormUpdate.append("idEmployee",res.data.idEmployee);
+          FormUpdate.append("id",idCampaign);
+          const resUpdate=await axios.post("http://localhost:8081/api/campaign/changestatus",FormUpdate,{
+            headers:{
+               "Authorization":`Bearer ${token}`
+            }
+          })
+          if(resUpdate){
+            swal("Good job!", "This Campaign has been approved!", "success");
+          }
+        }
+      
+
+       }
+
+      } catch (error) {
+        console.error('Invalid token:', error);
+      }
+    }
+  }
+
+  }
   const HandleSelectFaculty=(id)=>{
     setFaculty(id);
     getSpecializedById(id).then((response)=>{
@@ -132,12 +231,22 @@ const CampaignTable=()=>{
 
    getDetailCampaign(id).then((response)=>{
     setDetailCampaign(response.data);
+    
+    setDetailFaculty(response.data.recipientDto.facultyDto);
+    setDetailSpecialized(response.data.recipientDto.specializedDto);
+    setDetailRecipient(response.data.recipientDto);
+    alert(detailRecipient.acadamyEndYear)
     console.log(response.data);
-    alert(detailCampaign)
+    
    
    }).catch((error) => {
     console.error("Error fetching campaign data:", error);
   },[id])
+
+  getImage(id).then((res)=>{
+     setDetailImageCampaign(res.data);
+  
+  })
   setOpenUpdate(true);
   }
   
@@ -332,7 +441,7 @@ const CampaignTable=()=>{
                         color="secondary"
                         fullWidth
                         onChange={e=>HandleSelectFaculty(e.target.value)}
-                        // onChange={HandleSelectFaculty(faculty)}
+                    
                         required
                         sx={{ mb: 4 }}>
                  {
@@ -469,9 +578,12 @@ const CampaignTable=()=>{
                         type="text"
                         variant='outlined'
                         color='secondary'
-                       onChange={e=>setCampaignName(e.target.value)}
+                       onChange={e=>setDetailCampaign(preData=>({
+                        ...preData,
+                        campaignName:e.target.value
+                       }))}
                         fullWidth
-                        // value={getDetailCampaign.campaignName}
+                        value={detailCampaign.campaignName}
                         required
                     />
           </Col>
@@ -494,9 +606,12 @@ const CampaignTable=()=>{
                         type="text"
                         variant='outlined'
                         color='secondary'
-                       onChange={e=>setCampaignContent(e.target.value)}
+                       onChange={e=>setDetailCampaign(preData=>({
+                        ...preData,
+                        content:e.target.value
+                       }))}
                         fullWidth
-                        // value={detailCampaign.content}
+                        value={detailCampaign.content}
                         required
                     />
           </Col>
@@ -511,9 +626,12 @@ const CampaignTable=()=>{
             type="number"
                         variant='outlined'
                         color='secondary'
-                        onChange={e=>setTargetAmount(e.target.value)}
+                        onChange={e=>setDetailCampaign(preData=>({
+                          ...preData,
+                          targetAmount:e.target.value
+                        }))}
                         fullWidth
-                        // value={detailCampaign.targetAmount }
+                        value={detailCampaign.targetAmount }
                         required
           />
         </Col>
@@ -523,9 +641,12 @@ const CampaignTable=()=>{
             type="date"
                         variant='outlined'
                         color='secondary'
-                       onChange={e=>setEndDateExpect(e.target.value)}
+                       onChange={e=>setDetailCampaign(preData=>({
+                        ...preData,
+                        endDateExpect:e.target.value
+                       }))}
                         fullWidth
-                        // value={detailCampaign.endDateExpect}
+                        value={detailCampaign.endDateExpect}
                         required
           />
         </Col>
@@ -538,9 +659,12 @@ const CampaignTable=()=>{
             type="text"
                         variant='outlined'
                         color='secondary'
-                       onChange={e=>setStudentName(e.target.value)}
+                       onChange={e=>setDetailRecipient(preData=>({
+                        ...preData,
+                        fullName:e.target.value
+                       }))}
                         fullWidth
-                        // value={detailCampaign.recipientDto.fullName}
+                        value={detailRecipient.fullName}
                         required
           />
         </Col>
@@ -550,8 +674,11 @@ const CampaignTable=()=>{
             type="numbers"
                         variant='outlined'
                         color='secondary'
-                       onChange={e=>setStudentNumber(e.target.value)}
-                      //  value={detailCampaign.recipientDto.numberStudent}
+                       onChange={e=>setDetailRecipient(preData=>({
+                        ...preData,
+                        numberStudent:e.target.value
+                       }))}
+                       value={detailRecipient.numberStudent}
                         fullWidth
                         required
           />
@@ -559,7 +686,7 @@ const CampaignTable=()=>{
       </Row>
 
        <Row>
-       <Col xs={12} md={6}>
+       {/* <Col xs={12} md={6}>
         Faculty
        <TextField
       
@@ -569,8 +696,8 @@ const CampaignTable=()=>{
                         color="secondary"
                         fullWidth
                         onChange={e=>HandleSelectFaculty(e.target.value)}
-                        // value={detailCampaign.recipientDto.facultyDto.nameFaculty}
-                        // onChange={HandleSelectFaculty(faculty)}
+                        value={detailCampaign.recipientDto.facultyDto.idFaculty}
+                      
                         required
                         sx={{ mb: 4 }}>
                  {
@@ -578,8 +705,7 @@ const CampaignTable=()=>{
                     <MenuItem  value={faculty.idFaculty}>{faculty.nameFaculty}</MenuItem>
                 ))
                  }
-                {/* <MenuItem  value="Nam">Nam</MenuItem>
-                <MenuItem value="Nữ">Nữ</MenuItem> */}
+                
                 </TextField>
            </Col>
            <Col xs={12} md={6}>
@@ -592,7 +718,7 @@ const CampaignTable=()=>{
                         color="secondary"
                         fullWidth
                         onChange={e=>setSpecialized(e.target.value)}
-                        // value={detailCampaign.recipientDto.specializedDto.nameSpecialized}
+                        //  value={1}
                         required
                         sx={{ mb: 4 }}>
              {
@@ -600,10 +726,9 @@ const CampaignTable=()=>{
                 <MenuItem  value={spec.idSpecialized}>{spec.nameSpecialized}</MenuItem>
               ))
              }
-                {/* <MenuItem  value="Nam">Nam</MenuItem>
-                <MenuItem value="Nữ">Nữ</MenuItem> */}
+                
                 </TextField>
-           </Col>
+           </Col> */}
            <Row>
           <Col xs={12} md={4}>
             Class
@@ -611,8 +736,11 @@ const CampaignTable=()=>{
                         type="text"
                         variant='outlined'
                         color='secondary'
-                       onChange={e=>setClassStudent(e.target.value)}
-                      //  value={detailCampaign.recipientDto.classRecipient}
+                       onChange={e=>setDetailRecipient(preData=>({
+                        ...preData,
+                        classRecipient:e.target.value
+                       }))}
+                       value={detailRecipient.classRecipient}
                         fullWidth
                         required
                     />
@@ -622,11 +750,14 @@ const CampaignTable=()=>{
           <Col xs={12} md={4}>
           Start Year
           <TextField
-                        type="number"
+                        type="text"
                         variant='outlined'
                         color='secondary'
-                         onChange={e=>setStartYear(e.target.value)}
-                        //  value={detailCampaign.recipientDto.acadamyStartYear}
+                         onChange={e=>setDetailRecipient(preData=>({
+                          ...preData,
+                          acadamyStartYear:e.target.value
+                         }))}
+                         value={detailRecipient.acadamyStartYear}
                         fullWidth
                         required
                     />
@@ -634,17 +765,33 @@ const CampaignTable=()=>{
           <Col xs={12} md={4}>
           End Year
           <TextField
-                        type="number"
+                        type="text"
                         variant='outlined'
                         color='secondary'
-                        onChange={e=>setEndYear(e.target.value)}
-                        // value={detailCampaign.recipientDto.acadamyEndYear}
+                        onChange={e=>setDetailRecipient(preData=>({
+                          ...preData,
+                          acadamyEndYear:e.target.value
+                        }))}
+                         value={detailRecipient.acadamyEndYear}
                         fullWidth
                         required
                     />
           </Col>
         </Row>
            <Row>
+           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {detailImageCampaign.map((image, index) => (
+              <Box key={index} sx={{ position: 'relative' }}>
+                <img src={image.urlImage} alt={`img-${index}`} width={100} height={100} style={{ objectFit: 'cover' }} />
+                <IconButton 
+                  // onClick={() => handleDeleteImage(index)} 
+                  sx={{ position: 'absolute', top: -10, right: -10, color: 'red' }}
+                >
+                  <ClearOutlinedIcon />
+                </IconButton>
+              </Box>
+            ))}
+          </Box>
            Select Image
            <Col xs={12} md={12}>
          
@@ -725,13 +872,13 @@ const CampaignTable=()=>{
                         </TableCell> */}
                         <TableCell >
                         <Box display="flex" justifyContent="center" gap={2}>
-                          <Button variant="outlined">Accept</Button>
-                          <Button variant="outlined" color="error">Deny</Button>
+                          <Button onClick={()=>handleAccept(row.idCampaign)}  variant="outlined">Accept</Button>
+                          <Button onClick={()=>handleDeny(row.idCampaign)} variant="outlined" color="error">Deny</Button>
                         </Box>  
                         </TableCell>
                          
                          <TableCell>
-                         <Button onClick={()=>HandleDetail(row.idCampaign)}  variant="outlined" endIcon={<RemoveRedEyeOutlinedIcon />}>
+                         <Button onClick={()=>HandleDetail(row.idCampaign)}  variant="outlined" >
                                         Detail
                                            </Button>
                          </TableCell>
