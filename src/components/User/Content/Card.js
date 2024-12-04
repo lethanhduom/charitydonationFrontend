@@ -7,6 +7,7 @@ import { CampaginDisplayUser } from '../../../Service/UserService';
 import { getImageRepresent } from '../../../Service/Campaign';
 import CampaignDetail from './CampaignDetail';
 import Modal from '@mui/material/Modal';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 const CardContainer = styled.div`
   padding: 50px;
@@ -62,6 +63,12 @@ const Footer = styled.div`
 const Card = () => {
 
   const [campaignList,setCampaignList]=useState([]);
+  const navigate=useNavigate();
+  const handleClick=(id)=>{
+    // <Link to={"/campaign/"+id}></Link>
+  navigate("/campaign/"+id);
+    // alert(id)
+  }
  
   useEffect((async)=>{
     CampaginDisplayUser(0,9).then((response)=>{
@@ -109,7 +116,11 @@ const Card = () => {
       <ProgressBar completed={7} />
       <Footer>
         <span>1,084 lượt quyên góp</span>
-        <CampaignDetail />
+        {/* <CampaignDetail /> */}
+        <Button
+                className='outlined'
+              onClick={()=>handleClick(campaign.idCampaign)}
+            >Quyên góp</Button>
       </Footer>
 
       </CardContain>

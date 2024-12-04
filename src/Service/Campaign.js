@@ -39,3 +39,7 @@ export const changeStatusDetail=(form)=>{
 export const getImageRepresent=(id)=>{
     return axios.get(REST_API_CAMPAIGN_BASE_URL+"/campaign/getimagerepresent/"+id);
 }
+
+export const updateCurrentMoney=(form)=>{
+    return axios.post(REST_API_CAMPAIGN_BASE_URL+"/campaign/updatecurrentmoney",form);
+}

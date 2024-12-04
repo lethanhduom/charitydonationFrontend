@@ -19,6 +19,8 @@ import CancelPage from './components/User/PayPal/CancelPage';
 import SuccessPage from './components/User/PayPal/SuccessPage';
 import SignIn from './components/User/Sign-In/SignIn';
 import Authenticate from './components/User/Sign-In/Authenticate';
+import CampaignDetail from './components/User/Content/CampaignDetail';
+import PaymentSuccess from './components/User/Content/PaymentSuccess';
 
 
 
@@ -47,8 +49,10 @@ function App() {
     </Route> 
     </Route>
     <Route path='/' element={<User/>}>
-     
+    <Route path ="campaign/:id" element={<CampaignDetail/>}/>
     </Route>
+    <Route path='/vnp/payment-success' element={<PaymentSuccess/>}></Route>
+    
     <Route path='/login' element={<SignIn/>}></Route>
      <Route path='/authenticate' element={<Authenticate/>}></Route>
     {/* <Route path="/payment" element={<PaymentPage/>}/> */}

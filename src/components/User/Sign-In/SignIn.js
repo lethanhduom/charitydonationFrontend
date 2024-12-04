@@ -113,7 +113,7 @@ const handleLogin=(async)=>{
         loginUser(userAccount).then((response)=>{
           
            if(response.data.authenticated===true){
-            sessionStorage.setItem("userToken",response.data.token);
+            localStorage.setItem("userToken",response.data.token);
             
             console.log(sessionStorage.getItem("userToken"));
             swal({

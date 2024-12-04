@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "@mui/material/Button";
 import ProgressBar from "./ProgressBar";
-import { Dialog } from "@mui/material";
+import { Dialog, TextField } from "@mui/material";
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -12,8 +12,15 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { DataGrid } from "@mui/x-data-grid";
-import { ButtonGroup } from "react-bootstrap";
-
+import { ButtonGroup, Col, Row } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
+import { getDetailCampaign } from "../../../Service/Campaign";
+import { getImage } from "../../../Service/Campaign";
+import Modal1 from '@mui/material/Modal';
+import { CreateVNpay } from "../../../Service/VNpay";
+import { getAccountByUserName } from "../../../Service/AccountService";
+import { introspect } from "../../../Service/AccountService";
+import { jwtDecode } from "jwt-decode";
 const CampaignDetailContainer = styled.div`
   padding: 20px;
   max-width: 1200px;
@@ -110,7 +117,17 @@ const DonateButton = styled(Button)`
 const HouseDonorsList = styled.div`
   margin-top: 20px;
 `;
-
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 const DonorItem = styled.div`
   font-size: 14px;
   margin-bottom: 8px;
@@ -141,28 +158,108 @@ const columns = [
         headerAlign: 'center',
     }
 ]
-const CampaignDetail = () => {
+const CampaignDetail = (async) => {
+   
+    const navigate=useNavigate();
     const storyRef = useRef(null);
     const donorsRef = useRef(null);
     const newsRef = useRef(null);
     const backgroundRef = useRef(null);
-    const [open, setOpen] = useState(false);
-
+    const [open, setOpen] = useState(true);
+    const { id } = useParams();
+    const [campaign,setCampaign]=useState({});
+    const [imageCampaign,setImageCampaign]=useState([])
+    const [openSelect,setOpenSelect]=useState(false);
+    const [money,setMoney]=useState()
+    const [account,setAccount]=useState()
+    // const []
     const handleClose = () => {
-        setOpen(false);
+        navigate("/");
     };
+    const handleOpen=()=>{
+        setOpenSelect(true);
+    }
     const handleClickOpen = () => {
         setOpen(true);
     };
     const scrollToRef = (ref) => {
         ref.current?.scrollIntoView({ behavior: "smooth" });
     };
+    // const [smallImages,setSmallImages]=useState([]);
+    const [smallImages, setSmallImage] = useState([]);
+   useEffect(() => {
 
-    const smallImages = [
-        "https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128165634-638684097945553593.jpg",
-        "https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128170155-638684101158420473.jpg",
-        "https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128170203-638684101237830779.jpg",
-    ];
+    Promise.all([
+        getDetailCampaign(id),
+        getImage(id)
+    ]).then(([resCampaign,resImage])=>{
+        setCampaign(resCampaign.data);
+        setImageCampaign(resImage.data);
+    })
+    .catch((err) => {
+        console.error('Lỗi khi gọi API:', err);
+      });
+
+
+  }, [id]);
+
+  useEffect(() => {
+    // Truyền chỉ các URL từ mảng imageCampaign vào mảng smallImage
+    const urls = imageCampaign.map(image => image.urlImage); 
+    setSmallImage(urls); 
+    console.log(smallImages)
+  }, [imageCampaign]); 
+
+  const handleVNPay=async(amount)=>{
+//    CreateVNpay(amount).then((res)=>{
+//     console.log(res.data)
+//     const token =localStorage.getItem('saveToken');
+
+    // const decodedToken = jwtDecode(token);
+   
+    // alert(resIntro.data)
+    //    const response=await getAccountByUserName(decodedToken.sub);
+    // const inforPayment=()
+//     localStorage.setItem("inforPayment",)
+//     window.location.href=res.data
+//    })
+const token =localStorage.getItem('userToken');
+      const res= await introspect(token);
+      
+      if(res.data.valid===true){
+        const decodedToken = jwtDecode(token);
+        const resAccount=await getAccountByUserName(decodedToken.sub);
+        const inforPayment=({
+            amount:amount,
+            idCampaign:id,
+            idAccount:resAccount.data.idAccount
+        });
+        localStorage.setItem("inforPayment",JSON.stringify(inforPayment));
+      }else{
+        const inforPayment=({
+            amount:amount,
+            idCampaign:id,
+            idAccount:0
+            
+          
+        })
+        localStorage.setItem("inforPayment",JSON.stringify(inforPayment));
+      }
+      const resVnPay= await CreateVNpay(amount);
+      window.location.href=resVnPay.data;
+
+
+  }
+//  
+        
+    // )
+    // const smallImages = [
+    //     "https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128165634-638684097945553593.jpg",
+    //     "https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128170155-638684101158420473.jpg",
+    //     "https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128170203-638684101237830779.jpg",
+    // ];
+    
+   
     const [currentImage, setCurrentImage] = useState(smallImages[0]);
     const donorLists = [
         {
@@ -177,11 +274,47 @@ const CampaignDetail = () => {
         }
     ]
     return (
+        
         <>
-            <Button
+          {openSelect&& <Modal1
+  open={true}
+  onClose={handleClose}
+  aria-labelledby="modal-modal-title"
+  aria-describedby="modal-modal-description"
+>
+  <Box sx={style}>
+  <Row>
+          <Col xs={12} md={12}>
+            Enter Your Money
+            <TextField
+                        type="number"
+                        variant='outlined'
+                        color='secondary'
+                        onChange={e=>setMoney(e.target.value)}
+                        fullWidth
+                        required
+                    />
+
+                
+          </Col>
+          </Row>
+          <Row   className="d-flex justify-content-end align-items-center">
+       <Col xs="auto">
+       <button type="button" className="btn btn-outline-success">Close</button>
+       
+       </Col>
+       <Col xs="auto">
+       
+       <button type="submit" onClick={()=>handleVNPay(money)} className="btn btn-outline-warning">Accept</button>
+       </Col>
+       </Row>
+  </Box>
+</Modal1>
+          }
+            {/* <Button
                 className='outlined'
                 onClick={handleClickOpen}
-            >Quyên góp</Button>
+            >Quyên góp</Button> */}
             <Dialog
                 fullScreen
                 open={open}
@@ -210,18 +343,19 @@ const CampaignDetail = () => {
 
                 <CampaignDetailContainer>
                     <div ref={backgroundRef}>
-                        <Title>Chung tay xây cầu mới cho thôn Bản Khun, xã Yên Cường, huyện Bắc Mê, tỉnh Hà Giang</Title>
+
+                        <Title>
+                        {campaign.campaignName}
+                        </Title>
                         <Description>
-                            ❤️ Cây cầu kiên cố sẽ có ý nghĩa lớn đối với nhân dân thôn Bản Khun và các thôn lân cận, tạo điều kiện
-                            thuận lợi cho bà con nhân dân trên địa bàn đi lại, giao thương dễ dàng hơn, qua đó góp phần cho kinh tế địa
-                            phương ngày càng phát triển.
+                       
                         </Description>
                         <Date>28/11/2024</Date>
 
                         <ContentWrapper>
                             {/* Hình ảnh */}
                             <ImageContainer>
-                                <LargeImage src={currentImage} alt="Main Campaign" />
+                                <LargeImage src={currentImage} />
                                 <SmallImageWrapper >
                                     {smallImages.map((image, index) => (
                                         <SmallImage
@@ -252,7 +386,7 @@ const CampaignDetail = () => {
                                     </Stats>
                                 </DonationInfo>
 
-                                <DonateButton variant="contained">Quyên góp</DonateButton>
+                                <DonateButton onClick={()=>handleOpen()} variant="contained">Quyên góp</DonateButton>
                             </Sidebar>
                         </ContentWrapper>
                     </div>
@@ -326,11 +460,9 @@ const CampaignDetail = () => {
                             Câu chuyện
                         </Typography>
                         <p>
-                            Xã Yên Cường là một trong những địa phương vùng sâu, vùng xa, khó khăn của huyện Bắc Mê, tỉnh Hà Giang. Xã
-                            có 11 dân tộc anh em cùng sinh sống tại 17 thôn có 7.495 khẩu với 1.372 hộ; gồm các dân tộc Mông, Tày, Kinh,
-                            Dao, Nùng...
+                            {campaign.content}
                         </p>
-                        <img src="https://homepage.momocdn.net/blogscontents/momo-amazone-s3-api-241128165735-638684098556122216.jpg" alt="Story " />
+                        <img src={smallImages[0]} alt="Story " />
                     </div>
 
                     {/* Phần nhà hảo tâm */}
