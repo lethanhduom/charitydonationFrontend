@@ -5,8 +5,9 @@ import { introspect } from "../../../Service/AccountService";
 import swal from 'sweetalert'
 import { Navigate } from "react-router-dom";
 const Header = (props) => {
-  const [checkToken,setcheckToken]=useState(false);
-  const token=sessionStorage.getItem("userToken");
+
+  const [checkToken, setcheckToken] = useState(false);
+  const token = sessionStorage.getItem("userToken");
   //  introspect(token).then((response)=>{
   //   setcheckToken(response.data.valid);
   //   if(token!=null&&response.data.valid===false){
@@ -18,6 +19,7 @@ const Header = (props) => {
   //     // Navigate(to)
   //   }
   //  })
+
   return (
     <Container>
       <Logo>
@@ -27,26 +29,29 @@ const Header = (props) => {
         </a>
       </Logo>
       <NavMenu>
-     
+
         <a href="/">
-          <span>Home</span>
+          <span>Tường nhân ái</span>
         </a>
         <a href="/about">
-          <span>About us</span>
+          <span>Về chúng tôi</span>
         </a>
         <a href="/contact">
-          <span>Contact us</span>
+          <span>Liên hệ</span>
+        </a>
+        <a href="/addCampaign">
+          <span> Gây quỹ</span>
         </a>
       </NavMenu>
       <Wrap></Wrap>
-     {checkToken?<Login>
-      <a href="/">Logout</a>
-     </Login>:
-      <Login>
-        <a href="/login">Login</a>
-      </Login>
-     }
-     
+      {checkToken ? <Login>
+        <a href="/">Đăng xuất</a>
+      </Login> :
+        <Login>
+          <a href="/login">Đăng nhập</a>
+        </Login>
+      }
+
     </Container>
   );
 };

@@ -107,14 +107,7 @@ const DonateButton = styled(Button)`
   font-weight: bold !important;
   width: 100%;
 `;
-const HouseDonorsList = styled.div`
-  margin-top: 20px;
-`;
 
-const DonorItem = styled.div`
-  font-size: 14px;
-  margin-bottom: 8px;
-`;
 const columns = [
     {
         field: 'index',
@@ -202,7 +195,7 @@ const CampaignDetail = () => {
                             <CloseIcon />
                         </IconButton>
                         <Typography sx={{ ml: 2, flex: 1, fontWeight: 'bold', fontSize: 24 }} variant="h6" component="div">
-                            Câu chuyện
+                            Quyên góp
                         </Typography>
 
                     </Toolbar>
