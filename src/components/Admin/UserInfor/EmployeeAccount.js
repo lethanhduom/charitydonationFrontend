@@ -5,21 +5,28 @@ import { MenuItem } from '@mui/material';
  import "../UserInfor/UserForm.css"
 import listRole from '../../../Service/RoleService';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import { getFaculty } from '../../../Service/FacultyService';
 const EmployeeAccount=()=>{
-    const [Faculty, setFaculty] = useState('')
+    const [Faculty, setFaculty] = useState([])
     const [IdEmployee, setIdEmployee] = useState('')
     const [Address, setAddress] = useState('')
+    const [getvalueFaculty,setvalueFaculty]=useState()
      
     const navigate=useNavigate();
- 
+   
+    useEffect(()=>{
+        getFaculty().then((res)=>{
+            setFaculty(res.data);
+        })
+    },[Faculty])
 
 
     function handleSubmit(event) {
        
         event.preventDefault();
-        const employeeInfor=(Faculty,Address,IdEmployee);
+        const employeeInfor=(getvalueFaculty,Address,IdEmployee);
         localStorage.setItem("employeeInfor", JSON.stringify(employeeInfor));
-        console.log(Faculty,Address,IdEmployee) ;
+        console.log(getvalueFaculty,Address,IdEmployee) ;
        navigate("add")
        
     }
@@ -32,16 +39,26 @@ const EmployeeAccount=()=>{
             <div className='add-form-container'>
             <form  onSubmit={handleSubmit} action={<Link to="/" />}>
                 <Stack spacing={2} direction="row" sx={{marginBottom: 4}}>
-                    <TextField
-                        type="text"
-                        variant='outlined'
-                        color='secondary'
-                        label="Faculty"
-                        onChange={e => setFaculty(e.target.value)}
-                        value={Faculty}
+
+                  <TextField
+      
+                        select
+                       label="Faculty"
+                        variant="outlined"
+                        color="secondary"
                         fullWidth
+                       onChange={e=>setvalueFaculty(e.target.value)}
+                    
                         required
-                    />
+                        sx={{ mb: 4 }}>
+                 {
+                  Faculty.map((faculty)=>(
+                    <MenuItem  value={faculty.idFaculty}>{faculty.nameFaculty}</MenuItem>
+                ))
+                 }
+                {/* <MenuItem  value="Nam">Nam</MenuItem>
+                <MenuItem value="Nữ">Nữ</MenuItem> */}
+                </TextField>
                  
                 </Stack>
                 <Stack spacing={2} direction="row" sx={{marginBottom: 4}}>

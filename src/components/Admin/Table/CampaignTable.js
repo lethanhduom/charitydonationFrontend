@@ -15,7 +15,8 @@ import Modal1 from '@mui/material/Modal';
 import { getSpecialized } from '../../../Service/SpecializedService';
 import { getSpecializedById } from '../../../Service/SpecializedService';
 import { getFaculty } from '../../../Service/FacultyService';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import { UpdateCampaign } from '../../../Service/Campaign';
+import CustomCampaignDeny from './CustomCampaignDeny';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     TablePagination, Paper
@@ -32,6 +33,7 @@ import { getEmployeeByIdAccount } from '../../../Service/EmployeeService';
 import { getAccountByUserName } from '../../../Service/AccountService';
 import { changeStatusDetail } from '../../../Service/Campaign';
 import axios from 'axios';
+import dayjs from 'dayjs';
 const CampaignTable=()=>{
   //**Modal ****** */
   const style = {
@@ -47,6 +49,7 @@ const CampaignTable=()=>{
   };
 
   const [open, setOpen] = React.useState(false);
+  const[openDateSelect,setOpenDateSelect]=useState(false);
   const handleOpen = () => {
     setOpen(true);
 
@@ -58,6 +61,21 @@ const CampaignTable=()=>{
   const handleOpenUpdate = () => {
     setOpenUpdate(true);
 
+  }
+  const HandleUpdateCampaign=()=>{
+  
+    const dataUpdate=new FormData();
+    dataUpdate.append("campaignName",detailCampaign.campaignName);
+    dataUpdate.append("content",detailCampaign.content);
+    dataUpdate.append("targetAmount",parseFloat(detailCampaign.targetAmount));
+    dataUpdate.append("idCampaign",detailCampaign.idCampaign);
+    dataUpdate.append("endDateExpect",detailCampaign.endDateExpect);
+    UpdateCampaign(dataUpdate).then((res)=>{
+      swal({
+        title: "UPdate ̣Success!",
+        icon: "success",
+      });
+    })
   }
   const handleCloseUpdate = () => setOpenUpdate(false);
   
@@ -90,7 +108,11 @@ const CampaignTable=()=>{
    const [detailImageCampaign,setDetailImageCampaign]=useState([])
    const [accountPresent,setAccountPresent]=useState([])
    const [employeePresent,setEmployeePresent]=useState([])
+   const[idCampaignAccept,setIdCampaignAccept]=useState();
+   const [dateAccept,setDateAccept]=useState();
+   const startDate = dayjs().format('YYYY/MM/DD');
     // useEffect(()=>{
+
     //   getSpecialized().then(response=>{
     //     setListSpecialized(response.data)
     //     console.log(response.data)
@@ -120,25 +142,26 @@ const CampaignTable=()=>{
     getCampaignPage(page,rowsPerPage).then(response=>{
         setCampaign(response.data.content);
         setTotalPage(response.data.totalPages);
+        setLenth(response.data.totalElements)
     }).catch(error=>console.error(error));
 },[page,rowsPerPage])
 
 
-  useEffect(()=>{
-    getLengthCampaign().then(response=>{
-        setLenth(response.data);
-    }).catch(error=>console.error(error))
-  },[])
+  // useEffect(()=>{
+  //   getLengthCampaign().then(response=>{
+  //       setLenth(response.data);
+  //   }).catch(error=>console.error(error))
+  // },[])
   const handleFileChange = (event) => {
     setFiles(event.target.files);
   };
   const handleDeny=async(idCampaign)=>{
-    alert(idCampaign)
+    
     const token=sessionStorage.getItem("token");
     if (token){
       const willCreate = await swal({
         title: "Are you sure?",
-        text: "Do you want to Accept this Campaign?",
+        text: "Do you want to Deny this Campaign?",
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -156,6 +179,7 @@ const CampaignTable=()=>{
           FormUpdate.append("status",2);
           FormUpdate.append("idEmployee",res.data.idEmployee);
           FormUpdate.append("id",idCampaign);
+          FormUpdate.append("startDate",startDate)
           const resUpdate=await axios.post("http://localhost:8081/api/campaign/changestatus",FormUpdate,{
             headers:{
                "Authorization":`Bearer ${token}`
@@ -163,6 +187,8 @@ const CampaignTable=()=>{
           })
          if(resUpdate){
           swal("Good job!", "This Campaign has been dinied!", "success");
+         }else{
+         
          }
         }
       
@@ -175,8 +201,13 @@ const CampaignTable=()=>{
     }
   }
   }
+  const handleAcceptFirst=(id)=>{
+    setOpenDateSelect(true);
+    setDetailImageCampaign(id);
+
+  }
   const handleAccept= async(idCampaign)=>{
-    alert(idCampaign)
+
     const token=sessionStorage.getItem("token");
     if (token){
       const willCreate = await swal({
@@ -199,6 +230,7 @@ const CampaignTable=()=>{
           FormUpdate.append("status",1);
           FormUpdate.append("idEmployee",res.data.idEmployee);
           FormUpdate.append("id",idCampaign);
+          FormUpdate.append("startDate",startDate)
           const resUpdate=await axios.post("http://localhost:8081/api/campaign/changestatus",FormUpdate,{
             headers:{
                "Authorization":`Bearer ${token}`
@@ -807,7 +839,7 @@ const CampaignTable=()=>{
        </Col>
        <Col xs="auto">
        
-       <button onClick={HandleCreateCampaign} type="submit" className="btn btn-outline-warning">Create</button>
+       <button onClick={HandleUpdateCampaign} type="submit" className="btn btn-outline-warning">Update</button>
        </Col>
        </Row>
       
@@ -817,6 +849,43 @@ const CampaignTable=()=>{
       </Modal1>
       }
       {/* close Modal detail */}
+      {/* Modal Select date */}
+     {openDateSelect&& <Modal1
+  open={true}
+  onClose={handleClose}
+  aria-labelledby="modal-modal-title"
+  aria-describedby="modal-modal-description"
+>
+  <Box sx={style}>
+  <Row>
+          <Col xs={12} md={12}>
+            Select Expire Date
+            <TextField
+                        type="date"
+                        variant='outlined'
+                        color='secondary'
+                        onChange={e=>setDateAccept(e.target.value)}
+                        fullWidth
+                        required
+                    />
+
+                
+          </Col>
+          </Row>
+          <Row   className="d-flex justify-content-end align-items-center">
+       <Col xs="auto">
+       <button type="button" className="btn btn-outline-success">Close</button>
+       
+       </Col>
+       <Col xs="auto">
+       
+       <button type="submit" onClick={()=>handleAccept(idCampaignAccept)} className="btn btn-outline-warning">Accept</button>
+       </Col>
+       </Row>
+  </Box>
+</Modal1>
+     }
+      {/* Close Modal Select date */}
      {/* <h3>List Account</h3> */}
      {BasicBreadcrumbs("admin","campaign",)}
      {/* <NavLink to ="create"> */}

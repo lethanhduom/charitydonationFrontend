@@ -21,6 +21,8 @@ export default function Authenticate() {
         {
           method: "POST",
         }
+
+        
       )
         .then((response) => {
           return response.json();
@@ -28,7 +30,9 @@ export default function Authenticate() {
         .then((data) => {
           console.log(data);
 
-          setToken(data.result?.token);
+          // setToken(data.result?.token);
+          setToken(data.token)
+          localStorage.removeItem("userToken");
           setIsLoggedin(true);
         });
     }

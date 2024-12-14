@@ -13,7 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { MenuItem } from '@mui/material';
 import { TextField  } from '@mui/material';
-import { _getUserByIdAccount, _getUserByIdAccountgetUserByIdAccount } from "../../../Service/UserService";
+import { _getUserByIdAccount } from "../../../Service/UserService";
 import '../Table/AccountTable.css'
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,

@@ -4,27 +4,47 @@ import { Link, Navigate, NavLink, useNavigate } from "react-router-dom"
 import { MenuItem } from '@mui/material';
  import "../UserInfor/UserForm.css"
 import listRole from '../../../Service/RoleService';
+import { getFaculty } from '../../../Service/FacultyService';
+import { getSpecializedById } from '../../../Service/SpecializedService';
 
  const UserAccount=()=>{
     const [AcadamyEndYear, setAcadamyEndYear] = useState('')
     const [AcadamyStartYear, setAcadamyStartYear] = useState('')
-    const [Faculty,setFuculty] = useState('')
+    const [Faculty,setFaculty] = useState('')
     const [idStudent, setIdStudent] = useState('')
     const [Class, setClass] = useState('')
     const[Address,setAddress]=useState('')
-
+    const[listFaculty,setListFaculty]=useState([]);
+    const [listSpecialized,setListSpecialized]=useState([])
+    const [specialized,setSpecialized]=useState()
     const navigate=useNavigate();
+
   // Gọi lại dữ liệu từ localStorage
 const commonInfor = JSON.parse(localStorage.getItem("commonInfor"));
 console.log(commonInfor);
- 
   
+useEffect(()=>{
+    getFaculty().then(response=>{
+      setListFaculty(response.data)
+      console.log(response.data
+        
+      )
+    }).catch(error=>console.error(error))
+  },[])
+  
+  const HandleSelectFaculty=(id)=>{
+    setFaculty(id);
+    getSpecializedById(id).then((response)=>{
+      alert(id);
+      setListSpecialized(response.data);
+    },[id])
+  }
     function handleSubmit(event) {
        
         event.preventDefault();
         // const history = useHistory();
-        console.log(Faculty, Class, AcadamyEndYear, AcadamyStartYear, idStudent,Address) ;
-        const UserInfor={Faculty,Class,AcadamyEndYear,AcadamyStartYear,idStudent,Address};
+        console.log(Faculty,specialized, Class, AcadamyEndYear, AcadamyStartYear, idStudent,Address) ;
+        const UserInfor={Faculty,specialized, Class,AcadamyEndYear,AcadamyStartYear,idStudent,Address};
         localStorage.setItem("userInfor",JSON.stringify(UserInfor));
        navigate("add")
     }
@@ -37,26 +57,40 @@ console.log(commonInfor);
             <div className='add-form-container'>
             <form  onSubmit={handleSubmit} action={<Link to="/" />}>
                 <Stack spacing={2} direction="row" sx={{marginBottom: 4}}>
+                <TextField
+      
+        select
+        label="Faculty"
+        variant="outlined"
+        color="secondary"
+        fullWidth
+        onChange={e=>HandleSelectFaculty(e.target.value)}
+         required
+      sx={{ mb: 4 }}>
+        {
+        listFaculty.map((faculty)=>(
+        <MenuItem  value={faculty.idFaculty}>{faculty.nameFaculty}</MenuItem>
+        ))
+}
+
+                    </TextField>
                     <TextField
-                        type="text"
-                        variant='outlined'
-                        color='secondary'
-                        label="Faculty"
-                        onChange={e => setFuculty(e.target.value)}
-                        value={Faculty}
-                        fullWidth
-                        required
-                    />
-                    <TextField
-                        type="text"
-                        variant='outlined'
-                        color='secondary'
-                        label="Class"
-                        onChange={e => setClass(e.target.value)}
-                        value={Class}
-                        fullWidth
-                        required
-                    />
+      
+      select
+      label="Faculty"
+      variant="outlined"
+      color="secondary"
+      fullWidth
+      onChange={e=>setSpecialized(e.target.value)}
+       required
+    sx={{ mb: 4 }}>
+      {
+      listSpecialized.map((specialized)=>(
+      <MenuItem  value={specialized.idSpecialized}>{specialized.nameSpecialized}</MenuItem>
+      ))
+}
+
+                  </TextField>
                 </Stack>
                 <Stack spacing={2} direction="row" sx={{marginBottom: 4}}>
                 <TextField
@@ -99,6 +133,18 @@ console.log(commonInfor);
                 <TextField
                     type="text"
                     variant='outlined'
+                    label="Class"
+                    color='secondary'
+                    onChange={e => setClass(e.target.value)}
+                    value={Class}
+                    fullWidth
+                    required
+                    sx={{mb: 4}}
+                />
+                </Stack>
+                <TextField
+                    type="text"
+                    variant='outlined'
                     label="Address"
                     color='secondary'
                     onChange={e => setAddress(e.target.value)}
@@ -107,7 +153,6 @@ console.log(commonInfor);
                     required
                     sx={{mb: 4}}
                 />
-                </Stack>
               
               
                 <Button variant="outlined" color="secondary" type="submit">Next</Button>

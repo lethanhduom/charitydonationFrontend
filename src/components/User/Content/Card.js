@@ -7,6 +7,8 @@ import { CampaginDisplayUser } from '../../../Service/UserService';
 import { getImageRepresent } from '../../../Service/Campaign';
 import CampaignDetail from './CampaignDetail';
 import Modal from '@mui/material/Modal';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Pagination } from '@mui/material';
 
 const CardContainer = styled.div`
   padding: 50px;
@@ -62,9 +64,19 @@ const Footer = styled.div`
 const Card = () => {
 
   const [campaignList,setCampaignList]=useState([]);
+  const navigate=useNavigate();
+  const [pageSize, setPageSize] = useState(9);
+  const handleClick=(id)=>{
+    // <Link to={"/campaign/"+id}></Link>
+  navigate("/campaign/"+id);
+    // alert(id)
+  }
+  const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
+  const [totalPages, setTotalPages] = useState(0); 
+  const [open, setOpen] = useState(false);
  
   useEffect((async)=>{
-    CampaginDisplayUser(0,9).then((response)=>{
+    CampaginDisplayUser(currentPage,pageSize).then((response)=>{
       // setCampaignList(response.data.content)
       const campaigns = response.data.content;
       const updatedCampaigns = [...campaigns]; 
@@ -79,14 +91,17 @@ const Card = () => {
           // alert(campaignList.campaignimages.urlImage)
         })
       });
+      setTotalPages(response.data.totalPages);
     
      console.log(campaignList)
 
     })
-  },[])
+  },[currentPage])
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
 
-  const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -94,7 +109,7 @@ const Card = () => {
 
 
   return (
-  
+  <>
    
     <CardContainer>
  {campaignList.map((campaign,index)=>(
@@ -104,12 +119,16 @@ const Card = () => {
       
       <Title>{campaign.campaignName}</Title>
       
-      <SubTitle>Hands-On</SubTitle>
+      <SubTitle>Đang diễn ra</SubTitle>
       <Amount>{campaign.currentAmmout}đ / {campaign.targetAmount}đ</Amount>
-      <ProgressBar completed={7} />
+      <ProgressBar completed={Math.ceil(parseFloat(campaign.currentAmmout)/parseFloat(campaign.targetAmount))} />
       <Footer>
-        <span>1,084 lượt quyên góp</span>
-        <CampaignDetail />
+        <span></span>
+        {/* <CampaignDetail /> */}
+        <Button
+                className='outlined'
+              onClick={()=>handleClick(campaign.idCampaign)}
+            >Quyên góp</Button>
       </Footer>
 
       </CardContain>
@@ -117,13 +136,18 @@ const Card = () => {
     
 
 
-      {/* <Modal open={open} onClose={handleClose}>
-        <div>
-          <CampaignDetail />
-        </div>
-      </Modal> */}
+      
 
     </CardContainer>
+    <Pagination
+        count={totalPages}                 // Tổng số trang
+        page={currentPage + 1}             // Material-UI Pagination bắt đầu từ 1
+        onChange={(event, page) => handlePageChange(page - 1)}  // Chuyển về index từ 0
+        style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}
+      />
+    
+    </>
+    
   );
 };
 

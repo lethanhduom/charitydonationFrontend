@@ -26,9 +26,9 @@ export const loginUser=(user)=>{
 export const createAccountUser=(user)=>
     {
         return axios.post(REST_API_CREATE_USER,user,{
-            headers:{
-                Authorization: `Bearer ${tokenadmin}`
-            }
+            // headers:{
+            //     Authorization: `Bearer ${tokenadmin}`
+            // }
         });
 
     }
@@ -37,3 +37,8 @@ export const introspect=(token)=>axios.post("http://localhost:8081/api/account/i
 export const getAccountByUserName=(userName)=>{
     return axios.get(REST_API_BASE_URL+"/getaccount/"+userName);
 }
+
+export const getAccountById=(id)=>{
+    return axios.get(REST_API_BASE_URL+"/getaccountbyid/"+id);
+}
+
