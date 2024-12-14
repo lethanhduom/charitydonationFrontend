@@ -43,3 +43,43 @@ export const getImageRepresent=(id)=>{
 export const updateCurrentMoney=(form)=>{
     return axios.post(REST_API_CAMPAIGN_BASE_URL+"/campaign/updatecurrentmoney",form);
 }
+
+export const createCampaignFromUser =(form)=>{
+    return axios.post(REST_API_CAMPAIGN_BASE_URL+"/campaign/usercreate",form);
+}
+export const getCampaignPageOngoing=(page,size)=>{
+    return axios.get(REST_API_CAMPAIGN_BASE_URL+ "/admin/campaign/ongoing" + "?page="+page+"&size="+size,{
+        headers:{
+
+            // Authorization:`Bearer ${sessionStorage.getItem("token")}`,
+            // withCredentials: true,
+        }
+    });
+}
+
+export const getCampaignPageDeny=(page,size)=>{
+    return axios.get(REST_API_CAMPAIGN_BASE_URL+ "/admin/campaign/deny" + "?page="+page+"&size="+size,{
+        headers:{
+
+            // Authorization:`Bearer ${sessionStorage.getItem("token")}`,
+            // withCredentials: true,
+        }
+    });
+}
+
+export const getCampaignPageSuccess=(page,size)=>{
+    return axios.get(REST_API_CAMPAIGN_BASE_URL+ "/admin/campaign/success" + "?page="+page+"&size="+size,{
+        headers:{
+
+            // Authorization:`Bearer ${sessionStorage.getItem("token")}`,
+            // withCredentials: true,
+        }
+    });
+}
+export const UpdateCampaign=(form)=>{
+    return axios.put(REST_API_CAMPAIGN_BASE_URL+"/campaign/updateCampaign",form,{
+        headers:{
+            "Authorization":`Bearer ${token}`
+        }
+    })
+}

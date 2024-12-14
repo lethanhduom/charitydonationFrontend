@@ -116,11 +116,14 @@ const handleLogin=(async)=>{
             localStorage.setItem("userToken",response.data.token);
             
             console.log(sessionStorage.getItem("userToken"));
+            localStorage.removeItem("accessToken");
             swal({
                 title: "Login Success!",
                 icon: "success",
               });
               navigate("/")
+           }else{
+            
            }
         }).catch(error=>{
             console.log("Error"+error.response?.data);

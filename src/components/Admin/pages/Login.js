@@ -24,32 +24,7 @@ const Login=()=>{
           "password":password
        
         }
-       
-        // console.log(JSON.stringify ({
-        //   "userName":"HoangNghia",
-        //   "password":"12345"
-        // }))
-
-      //   axios({
-      //     url:'/api/admin/login',
-      //     data:adminAccount,
-      //     method:"POST",
-      //     mode: 'no-cors',
-      //     headers:{
-      //         "Content-Type": "application/json",
-      //       "Access-Control-Allow-Origin": "*",
-      //         "Access-Control-Request-Headers": 'Content-Type, Authorization'
-  
-      //     }
-      // })
-      // .then(res => {
-      //     console.log(res);
-          
-      // })
-      // .catch(err =>{
-      //     console.log(err);
-          
-      // })
+    
       const form=new FormData();
       form.append("userName",userName);
       form.append("password",password);
@@ -89,53 +64,7 @@ const Login=()=>{
       alert(2)
       console.error(error);
   }
-      // try{
-      //  loginAdmin(adminAccount).then((response)=>{
-      //     console.log(response);
-      //     alert(1)
-      //   }).catch(error=>{
-      //     console.error("Error:",error.response?.data);
-      //     alert(2)
-      //   })
-      // }catch(error){
-      //   console.error("ERROR:"+error);
-      // }
-      // const data = {
-      //   username: 'admin',
-      //   password: 'password123'
-      // };
-
-      // try {
-      //   const response = await axios.post('http://localhost:8081/api/admin/login', data, {
-      //     headers: {
-      //       'Content-Type': 'application/json',  // Đảm bảo đúng Content-Type
-      //     },
-      //   });
-      //   console.log('Login successful:', response.data);
-      // } catch (error) {
-      //   console.error('Login failed:', error.response ? error.response.data : error.message);
-      // }
-
-      // const account = {
-      //   "userName": "HoangNghia",
-      //   "password": "12345"
-      // };
-    
-      // try {
-      //   // Gửi yêu cầu POST với axios
-      //   const response =  axios.post('http://localhost:8081/api/admin/login', account, {
-      //     headers: {
-      //       'Content-Type': 'application/json',  // Đảm bảo header là application/json
-      //     },
-      //   });
-    
-      //   // Xử lý dữ liệu phản hồi từ server
-      //   console.log('Login successful:', response.data);
-      // } catch (error) {
-      //   console.error('Error:', error.response ? error.response.data : error.message);
-      // }
-    
-
+     
 
         
  

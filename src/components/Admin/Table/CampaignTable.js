@@ -15,7 +15,8 @@ import Modal1 from '@mui/material/Modal';
 import { getSpecialized } from '../../../Service/SpecializedService';
 import { getSpecializedById } from '../../../Service/SpecializedService';
 import { getFaculty } from '../../../Service/FacultyService';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import { UpdateCampaign } from '../../../Service/Campaign';
+import CustomCampaignDeny from './CustomCampaignDeny';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     TablePagination, Paper
@@ -60,6 +61,21 @@ const CampaignTable=()=>{
   const handleOpenUpdate = () => {
     setOpenUpdate(true);
 
+  }
+  const HandleUpdateCampaign=()=>{
+  
+    const dataUpdate=new FormData();
+    dataUpdate.append("campaignName",detailCampaign.campaignName);
+    dataUpdate.append("content",detailCampaign.content);
+    dataUpdate.append("targetAmount",parseFloat(detailCampaign.targetAmount));
+    dataUpdate.append("idCampaign",detailCampaign.idCampaign);
+    dataUpdate.append("endDateExpect",detailCampaign.endDateExpect);
+    UpdateCampaign(dataUpdate).then((res)=>{
+      swal({
+        title: "UPdate ̣Success!",
+        icon: "success",
+      });
+    })
   }
   const handleCloseUpdate = () => setOpenUpdate(false);
   
@@ -140,12 +156,12 @@ const CampaignTable=()=>{
     setFiles(event.target.files);
   };
   const handleDeny=async(idCampaign)=>{
-    alert(idCampaign)
+    
     const token=sessionStorage.getItem("token");
     if (token){
       const willCreate = await swal({
         title: "Are you sure?",
-        text: "Do you want to Accept this Campaign?",
+        text: "Do you want to Deny this Campaign?",
         icon: "warning",
         buttons: true,
         dangerMode: true,
@@ -163,6 +179,7 @@ const CampaignTable=()=>{
           FormUpdate.append("status",2);
           FormUpdate.append("idEmployee",res.data.idEmployee);
           FormUpdate.append("id",idCampaign);
+          FormUpdate.append("startDate",startDate)
           const resUpdate=await axios.post("http://localhost:8081/api/campaign/changestatus",FormUpdate,{
             headers:{
                "Authorization":`Bearer ${token}`
@@ -170,6 +187,8 @@ const CampaignTable=()=>{
           })
          if(resUpdate){
           swal("Good job!", "This Campaign has been dinied!", "success");
+         }else{
+         
          }
         }
       
@@ -188,7 +207,7 @@ const CampaignTable=()=>{
 
   }
   const handleAccept= async(idCampaign)=>{
-    alert(idCampaign)
+
     const token=sessionStorage.getItem("token");
     if (token){
       const willCreate = await swal({
@@ -820,7 +839,7 @@ const CampaignTable=()=>{
        </Col>
        <Col xs="auto">
        
-       <button onClick={HandleCreateCampaign} type="submit" className="btn btn-outline-warning">Create</button>
+       <button onClick={HandleUpdateCampaign} type="submit" className="btn btn-outline-warning">Update</button>
        </Col>
        </Row>
       

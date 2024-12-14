@@ -40,10 +40,10 @@ const InforAccount=()=>{
             user={
            
                 idNumber:userAccount.idStudent,
-                faculty3:{
+                facultyDto:{
                     idFaculty:userAccount.Faculty
                 },
-                specialized1:{
+                specializedDto:{
                     idSpecialized:userAccount.specialized
                 },
                 classUser:userAccount.Class,

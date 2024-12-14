@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Button from "@mui/material/Button";
 import ProgressBar from "./ProgressBar";
-import { Dialog, TextField } from "@mui/material";
+import { Dialog, Pagination, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -11,8 +11,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import { getAccountById } from "../../../Service/AccountService";
 import { DataGrid } from "@mui/x-data-grid";
-import { ButtonGroup, Col, Row } from "react-bootstrap";
+import { ButtonGroup, Col, Row, Table } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { getDetailCampaign } from "../../../Service/Campaign";
 import { getImage } from "../../../Service/Campaign";
@@ -20,6 +21,7 @@ import Modal1 from '@mui/material/Modal';
 import { CreateVNpay } from "../../../Service/VNpay";
 import { getAccountByUserName } from "../../../Service/AccountService";
 import { introspect } from "../../../Service/AccountService";
+import { getListDonation } from "../../../Service/DonationService";
 import { jwtDecode } from "jwt-decode";
 const CampaignDetailContainer = styled.div`
   padding: 20px;
@@ -172,6 +174,16 @@ const CampaignDetail = (async) => {
     const [openSelect,setOpenSelect]=useState(false);
     const [money,setMoney]=useState()
     const [account,setAccount]=useState()
+    const [userDetails, setUserDetails] = useState({});
+
+    const getUserDetails = async (accessToken) => {
+
+        const response = await fetch(
+          `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${accessToken}`
+        );
+        const data = await response.json();
+        setUserDetails(data);
+      };
     // const []
     const handleClose = () => {
         navigate("/");
@@ -211,19 +223,24 @@ const CampaignDetail = (async) => {
   }, [imageCampaign]); 
 
   const handleVNPay=async(amount)=>{
-//    CreateVNpay(amount).then((res)=>{
-//     console.log(res.data)
-//     const token =localStorage.getItem('saveToken');
 
-    // const decodedToken = jwtDecode(token);
-   
-    // alert(resIntro.data)
-    //    const response=await getAccountByUserName(decodedToken.sub);
-    // const inforPayment=()
-//     localStorage.setItem("inforPayment",)
-//     window.location.href=res.data
-//    })
 const token =localStorage.getItem('userToken');
+const tokenAccess=localStorage.getItem('accessToken');
+getUserDetails(tokenAccess);
+alert(userDetails.email)
+if(token===null&&tokenAccess===null){
+    const inforPayment=({
+        amount:amount,
+        idCampaign:id,
+        idAccount:0,
+        other:null
+
+         
+    });
+    localStorage.setItem("inforPayment",JSON.stringify(inforPayment));
+
+}
+else if(token!==null){
       const res= await introspect(token);
       
       if(res.data.valid===true){
@@ -232,17 +249,20 @@ const token =localStorage.getItem('userToken');
         const inforPayment=({
             amount:amount,
             idCampaign:id,
-            idAccount:resAccount.data.idAccount
+            idAccount:resAccount.data.idAccount,
+            other:null
         });
         localStorage.setItem("inforPayment",JSON.stringify(inforPayment));
-      }else{
+    }
+      
+      }else if(tokenAccess!==null){
+        getUserDetails(tokenAccess);
         const inforPayment=({
             amount:amount,
             idCampaign:id,
-            idAccount:0
-            
-          
-        })
+            idAccount:0,
+            other:userDetails.email
+        });
         localStorage.setItem("inforPayment",JSON.stringify(inforPayment));
       }
       const resVnPay= await CreateVNpay(amount);
@@ -250,6 +270,11 @@ const token =localStorage.getItem('userToken');
 
 
   }
+  useEffect(() => {
+    if (userDetails.email) {
+      alert(userDetails.email);
+    }
+  }, [userDetails]); 
 //  
         
     // )
@@ -261,18 +286,35 @@ const token =localStorage.getItem('userToken');
     
    
     const [currentImage, setCurrentImage] = useState(smallImages[0]);
-    const donorLists = [
-        {
-            'id': 1,
-            'donorName': 'Nguyễn Phương Linh',
-            'money': 300000
-        },
-        {
-            'id': 2,
-            'donorName': 'Nguyễn Quốc Bình',
-            'money': 240000
-        }
-    ]
+    const [pageSize, setPageSize] = useState(8);
+    const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
+  const [totalPages, setTotalPages] = useState(0); 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+    const [donorLists,setdonorLists] = useState([])
+    useEffect((async)=>{
+        const form=new FormData();
+        form.append("idCampaign",parseInt(id));
+        form.append("page",currentPage);
+        form.append("size",pageSize);
+        getListDonation(form).then((res)=>{
+            setdonorLists(res.data.content)
+setTotalPages(res.data.totalPages)
+        })
+    },[currentPage])
+   
+    //     {
+    //         'id': 1,
+    //         'donorName': 'Nguyễn Phương Linh',
+    //         'money': 300000
+    //     },
+    //     {
+    //         'id': 2,
+    //         'donorName': 'Nguyễn Quốc Bình',
+    //         'money': 240000
+    //     }
+    // ]
     return (
         
         <>
@@ -480,13 +522,47 @@ const token =localStorage.getItem('userToken');
                         </Typography>
                         <Box
                             sx={{ width: '800px', maxHeight: '500' }}
+
                         >
-                            <DataGrid
+                        <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>STT</TableCell>
+            <TableCell>Tên</TableCell>
+            <TableCell>Số Tiền</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {donorLists.map((row,index) => (
+            <TableRow key={row.idDonation}>
+       
+              <TableCell>{row.accountDto===null?"Other":row.accountDto.userName}</TableCell>
+              <TableCell>{row.amount}</TableCell>
+              <TableCell>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, auto)', gap: '8px' }}>
+  
+  
+   
+</div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Pagination
+        count={totalPages}                 // Tổng số trang
+        page={currentPage + 1}             // Material-UI Pagination bắt đầu từ 1
+        onChange={(event, page) => handlePageChange (page - 1)}  // Chuyển về index từ 0
+        style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}
+      />
+    </TableContainer>
+                            {/* <DataGrid
 
                                 rows={donorLists}
                                 columns={columns}
                             >
-                            </DataGrid>
+                            </DataGrid> */}
                         </Box>
 
                     </div>

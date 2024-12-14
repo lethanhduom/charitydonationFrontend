@@ -43,8 +43,8 @@ export const SidebarData = [
   },
   {
     icon: UilChart,
-    heading: 'Analytics',
-    link:'/admin/sfkd'
+    heading: 'History Campaign',
+    link:'/admin/detailCampaign'
   },
 ];
 

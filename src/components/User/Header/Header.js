@@ -1,23 +1,90 @@
 import styled from "styled-components";
 import image from "../Images/logo_user_page.png";
 import { useState } from "react";
-import { introspect } from "../../../Service/AccountService";
+import { createAccountUser, introspect } from "../../../Service/AccountService";
 import swal from 'sweetalert'
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { getToken } from "../../../Service/localStorageService";
+import { getAccountByUserName } from "../../../Service/AccountService";
+import dayjs from "dayjs";
+import { jwtDecode } from "jwt-decode";
 const Header = (props) => {
-  const [checkToken,setcheckToken]=useState(false);
-  const token=sessionStorage.getItem("userToken");
-  //  introspect(token).then((response)=>{
-  //   setcheckToken(response.data.valid);
-  //   if(token!=null&&response.data.valid===false){
-  //     swal({
-  //       title: 'Phiên Đăng Nhập của bạn hết!',
-  //       text: 'Vui lòng đăng nhập lại.',
-  //       timer: 2000
-  //     })
-  //     // Navigate(to)
-  //   }
-  //  })
+
+  const navigate = useNavigate();
+  const [userDetails, setUserDetails] = useState({});
+  const [userName,setUserName]=useState();
+  const getUserDetails = async (accessToken) => {
+
+    const response = await fetch(
+      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${accessToken}`
+    );
+    const data = await response.json();
+    
+    setUserDetails(data);
+  };
+  const getUserName=async(token)=>{
+    const decodedToken = jwtDecode(token);
+    setUserName(decodedToken.sub)
+  }
+  const getUserNameGoogle=async(accessToken)=>{
+     getUserDetails(accessToken);
+     setUserName(userDetails.name)
+  }
+const handleLogOut=()=>{
+
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem("userToken");
+}
+  const [checkToken, setcheckToken] = useState(false);
+  const token = localStorage.getItem("userToken");
+  const token_google=sessionStorage.getItem("accessToken");
+  const date = dayjs().format('YYYY/MM/DD');
+  
+  useEffect(()=>{
+   
+    const accessToken = getToken();
+    if(accessToken===null&&token===null){
+      return;
+    }
+    if (accessToken !== null) {
+      setcheckToken(true);  
+      getUserDetails(accessToken); 
+      getUserNameGoogle(accessToken);
+      // setUserName(getUserDetails(accessToken).name)
+    }
+    if (token !== null) {
+      introspect(token).then((response) => {
+        setcheckToken(response.data.valid);
+        getUserName(token);
+        if(response.data.valid===false){
+          localStorage.removeItem("userToken")
+        }
+        // const decodedToken = jwtDecode(token);
+      //  setUserName(decodedToken.sub);
+      });
+    }
+  
+   
+},[navigate])
+
+  
+
+ 
+  // useEffect(()=>{
+   
+        // if(token!==null&&response.data.valid===false){
+        //   swal({
+        //     title: 'Phiên Đăng Nhập của bạn hết!',
+        //     text: 'Vui lòng đăng nhập lại.',
+        //     timer: 2000
+        //   })
+          // Navigate(to)
+        // }
+      //  })
+
+  //  
+
   return (
     <Container>
       <Logo>
@@ -27,26 +94,33 @@ const Header = (props) => {
         </a>
       </Logo>
       <NavMenu>
-     
+
         <a href="/">
-          <span>Home</span>
+          <span>Tường nhân ái</span>
         </a>
         <a href="/about">
-          <span>About us</span>
+          <span>Về chúng tôi</span>
         </a>
         <a href="/contact">
-          <span>Contact us</span>
+          <span>Liên hệ</span>
+        </a>
+        <a href="/addCampaign">
+          <span> Gây quỹ</span>
         </a>
       </NavMenu>
       <Wrap></Wrap>
-     {checkToken?<Login>
-      <a href="/">Logout</a>
-     </Login>:
-      <Login>
-        <a href="/login">Login</a>
-      </Login>
-     }
-     
+      {checkToken ? <Login>
+        <a href="/" onClick={()=>handleLogOut()}>Đăng xuất</a>
+      </Login> :
+        <Login>
+          <a href="/login" >Đăng nhập</a>
+        </Login>
+      }
+      {checkToken&&
+        <Login>
+          <a href="/detailAccount" >{userDetails.name}</a>
+        </Login>
+      }
     </Container>
   );
 };
